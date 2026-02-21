@@ -93,6 +93,16 @@ pub fn size_display(bytes: u64) -> String {
 }
 
 #[macro_export]
+macro_rules! try_filename {
+    ($path:expr) => {
+        match $path.file_name() {
+            Some(name) => name.to_string_lossy().to_string(),
+            None => $path.to_string_lossy().to_string(),
+        }
+    };
+}
+
+#[macro_export]
 macro_rules! exit_error {
     (code=$code:expr, $($arg:tt)*) => {{
         use colored::Colorize;

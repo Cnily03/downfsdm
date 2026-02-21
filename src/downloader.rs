@@ -16,7 +16,7 @@ use url::Url;
 use crate::utils::http::{AdaptiveDelay, download_binary};
 use crate::utils::live_log::{LiveLog, LogStyle};
 use crate::utils::stat::size_display;
-use crate::{exit_error, remux_to_ts};
+use crate::{exit_error, remux_to_ts, try_filename};
 
 /// Sniff mime type via headers, return m3u8 or not
 pub async fn sniff_m3u8(client: &Client, url: &str, referer: &str) -> Result<bool> {
@@ -87,15 +87,6 @@ async fn find_valid_hash_cached(
         // Hash mismatch: file is corrupt or incomplete, ignore it.
     }
     None
-}
-
-macro_rules! try_filename {
-    ($path:expr) => {
-        match $path.file_name() {
-            Some(name) => name.to_string_lossy().to_string(),
-            None => $path.to_string_lossy().to_string(),
-        }
-    };
 }
 
 // * HLS / m3u8

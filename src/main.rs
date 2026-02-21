@@ -402,11 +402,11 @@ async fn main() -> Result<()> {
     );
     println!(
         "  {}",
-        format!("vlc \"{}\"", output_abs.to_string_lossy()).dimmed()
+        format!("vlc \"{}\"", try_filename!(output_abs)).dimmed()
     );
     println!(
         "  {}",
-        format!("mpv \"{}\"", output_abs.to_string_lossy()).dimmed()
+        format!("mpv \"{}\"", try_filename!(output_abs)).dimmed()
     );
 
     Ok(())
