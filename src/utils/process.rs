@@ -146,7 +146,8 @@ macro_rules! piped_or_inherit {
         match $on_data {
             Some(on_data) => {
                 let is_tty = std::io::IsTerminal::is_terminal(&std::io::stdout());
-                if $no_pty || !is_tty {
+                let pty_supported = !cfg!(windows);
+                if $no_pty || !is_tty || !pty_supported {
                     // No PTY (e.g. piped or redirected) — fall back to plain pipes.
                     crate::utils::process::run_piped($cmd, $args, on_data)
                 } else {

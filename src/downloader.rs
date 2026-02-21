@@ -159,7 +159,7 @@ pub async fn download_m3u8_segments(
             fs::create_dir_all(parent).await?;
         }
     }
-    let tmp_output = PathBuf::from(format!("{}.tmp", output.display()));
+    let tmp_output = PathBuf::from(format!("{}.tmp", output.to_string_lossy()));
     let mut out_file = tokio::io::BufWriter::new(fs::File::create(&tmp_output).await?);
 
     println!("{}", "Downloading and converting segments".blue());
@@ -229,7 +229,7 @@ pub async fn download_m3u8_segments(
                 &make_status(done, downloaded, reused),
                 Some(&format!(
                     "{label}  cached  {}",
-                    valid_ts.display().to_string().dimmed()
+                    valid_ts.to_string_lossy().to_string().dimmed()
                 )),
             );
             continue;
@@ -283,7 +283,12 @@ pub async fn download_m3u8_segments(
             &make_status(done - 1, downloaded, reused),
             Some(&format!(
                 "{label}  remuxing  {}",
-                format!("{} -> {}", raw_path.display(), tmp_path.display()).dimmed()
+                format!(
+                    "{} -> {}",
+                    raw_path.to_string_lossy(),
+                    tmp_path.to_string_lossy()
+                )
+                .dimmed()
             )),
         );
 
@@ -330,7 +335,7 @@ pub async fn download_m3u8_segments(
                 "DONE".green(),
                 size_display(raw_size_bytes).cyan(),
                 size_display(ts_size_bytes).cyan(),
-                ts_path.display().to_string().dimmed(),
+                ts_path.to_string_lossy().to_string().dimmed(),
             )),
         );
 

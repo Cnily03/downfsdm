@@ -93,12 +93,12 @@ async fn main() -> Result<()> {
     println!(
         "  {}  {}",
         "output    ".magenta(),
-        output_abs.display().to_string()
+        output_abs.to_string_lossy().to_string()
     );
     println!(
         "  {}  {}",
         "cache dir ".magenta(),
-        cache_dir_abs.display().to_string()
+        cache_dir_abs.to_string_lossy().to_string()
     );
 
     // try infer types by extension
@@ -297,8 +297,14 @@ async fn main() -> Result<()> {
         ));
 
         println!("{}", "Converting to final format".blue().bold());
-        println!("  input    {}", down_path_abs.display().to_string().cyan());
-        println!("  output   {}", output_abs.display().to_string().cyan());
+        println!(
+            "  input    {}",
+            down_path_abs.to_string_lossy().to_string().cyan()
+        );
+        println!(
+            "  output   {}",
+            output_abs.to_string_lossy().to_string().cyan()
+        );
         println!(
             "  format   {} {}",
             inferred_format.to_string().cyan(),
@@ -377,11 +383,17 @@ async fn main() -> Result<()> {
     println!(
         "{}  {} {}",
         "Output written".green().bold(),
-        output_abs.display().to_string().cyan(),
+        output_abs.to_string_lossy().to_string().cyan(),
         format!("({})", size_display(size_bytes)).yellow(),
     );
-    println!("  {}", format!("vlc \"{}\"", output_abs.display()).dimmed());
-    println!("  {}", format!("mpv \"{}\"", output_abs.display()).dimmed());
+    println!(
+        "  {}",
+        format!("vlc \"{}\"", output_abs.to_string_lossy()).dimmed()
+    );
+    println!(
+        "  {}",
+        format!("mpv \"{}\"", output_abs.to_string_lossy()).dimmed()
+    );
 
     Ok(())
 }
