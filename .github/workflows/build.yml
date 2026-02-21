@@ -1,0 +1,67 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  release:
+    types: [ created ]
+  workflow_dispatch:
+
+env:
+  CLI_NAME: downfsdm
+
+jobs:
+  build:
+    runs-on: ${{ matrix.build.os }}
+    strategy:
+      matrix:
+        build:
+          - { target: 'x86_64-pc-windows-msvc', os: 'windows-latest' }
+          - { target: 'x86_64-unknown-linux-gnu', os: 'ubuntu-latest' }
+          - { target: 'x86_64-apple-darwin', os: 'macos-latest' }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: stable
+
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
+    - name: Build
+      run: |
+        rustup target add '${{ matrix.build.target }}'
+        cargo build --release --bin '${{ env.CLI_NAME }}' --target '${{ matrix.build.target }}'
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: '${{ env.CLI_NAME }}-${{ matrix.build.target }}'
+        path: |
+          target/${{ matrix.build.target }}/release/${{ env.CLI_NAME }}
+          target/${{ matrix.build.target }}/release/${{ env.CLI_NAME }}.exe
+          target/${{ matrix.build.target }}/release/${{ env.CLI_NAME }}.pdb
+        retention-days: 1
+
+    - name: Upload release assets
+      if: github.event_name == 'release'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: target/${{ matrix.target }}/release/${{ env.CLI_NAME }}${{ contains(matrix.build.target, 'windows') && '.exe' || '' }}
+        asset_name: ${{ env.CLI_NAME }}-${{ matrix.build.target }}${{ contains(matrix.build.target, 'windows') && '.exe' || '' }}
+        asset_content_type: application/octet-stream
