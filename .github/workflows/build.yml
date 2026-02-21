@@ -59,6 +59,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: '${{ env.CLI_NAME }}-${{ matrix.build.target }}'
+        compression-level: 9
         path: |
           target/${{ matrix.build.target }}/release/${{ env.CLI_NAME }}
           target/${{ matrix.build.target }}/release/${{ env.CLI_NAME }}.exe
@@ -72,6 +73,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: target/${{ matrix.target }}/release/${{ env.CLI_NAME }}${{ contains(matrix.build.target, 'windows') && '.exe' || '' }}
+        asset_path: target/${{ matrix.build.target }}/release/${{ env.CLI_NAME }}${{ contains(matrix.build.target, 'windows') && '.exe' || '' }}
         asset_name: ${{ env.CLI_NAME }}-${{ matrix.build.target }}${{ contains(matrix.build.target, 'windows') && '.exe' || '' }}
         asset_content_type: application/octet-stream
