@@ -1,8 +1,11 @@
-# fsdm Downloader
+# FSDM Downloader
 
 This program can download media files, given a fsdm player html url.
 
 ## Usage
+
+> [!NOTE]
+> [FFmpeg](https://ffmpeg.org/) is required for this program to work, make sure it's installed and available in your PATH.
 
 Visit url like `https://www.fsdm02.com/vodplay/xxx-1-1.html` in browser, open dev tools and find the player url.
 
