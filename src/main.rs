@@ -386,6 +386,12 @@ async fn main() -> Result<()> {
             for path in clean_paths {
                 let _ = fs::remove_file(path).await;
             }
+            // if cache dir is empty after cleanup, remove it as well
+            if let Ok(mut entries) = fs::read_dir(&cache_dir).await {
+                if entries.next_entry().await?.is_none() {
+                    let _ = fs::remove_dir(&cache_dir).await;
+                }
+            }
         }
 
         println!();
