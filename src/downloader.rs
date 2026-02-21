@@ -102,14 +102,14 @@ macro_rules! try_filename {
 
 /// Fetch an m3u8 playlist, download every segment sequentially, remux each one
 /// to a proper .ts file, and stream-write a rewritten m3u8 to `output` (via a .tmp rename).
-/// * Returns a Vec of segment file paths (absolute).
+/// * Returns (segment paths, original m3u8 path)
 pub async fn download_m3u8_segments(
     client: &Client,
     m3u8_url: &str,
     referer: &str,
     cache_dir: &Path,
     output: &Path,
-) -> Result<Vec<PathBuf>> {
+) -> Result<(Vec<PathBuf>, PathBuf)> {
     println!("{}", "Loading m3u8 playlist".blue());
     println!("  m3u8 url  {}", m3u8_url.dimmed());
 
@@ -360,7 +360,7 @@ pub async fn download_m3u8_segments(
     drop(out_file);
     fs::rename(&tmp_output, output).await?;
 
-    Ok(seg_paths)
+    Ok((seg_paths, m3u8_abs_path))
 }
 
 // * Direct download

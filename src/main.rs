@@ -263,7 +263,7 @@ async fn main() -> Result<()> {
     };
 
     if is_m3u8 {
-        let paths = download_m3u8_segments(
+        let (paths, original_m3u8_path) = download_m3u8_segments(
             &client,
             &video_url,
             &args.player_url,
@@ -272,8 +272,9 @@ async fn main() -> Result<()> {
         )
         .await?;
         clean_paths.extend(paths);
+        clean_paths.push(original_m3u8_path);
     } else {
-        download_video(
+        let path = download_video(
             &client,
             &video_url,
             &args.player_url,
@@ -286,6 +287,9 @@ async fn main() -> Result<()> {
             },
         )
         .await?;
+        if !skip_convert {
+            clean_paths.push(path);
+        }
     }
     println!();
 
@@ -377,6 +381,7 @@ async fn main() -> Result<()> {
 
         live.lock().unwrap().finish(&make_status());
 
+        // Cleanup the intermediate files if needed
         if args.cleanup {
             for path in clean_paths {
                 let _ = fs::remove_file(path).await;
