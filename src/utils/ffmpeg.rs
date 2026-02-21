@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::{OnceLock, RwLock};
 use strum::{Display, EnumString};
@@ -17,7 +17,7 @@ pub fn ffmpeg_bin() -> String {
 }
 
 /// Call this before any ffmpeg functions.
-pub fn set_ffmpeg_binary(ffmpeg_bin: &str) -> Result<(String, String)> {
+pub fn set_ffmpeg_binary(ffmpeg_bin: &str) -> Result<(PathBuf, String)> {
     // check binary exists
     let abs_ffmpeg_bin = which::which(ffmpeg_bin)
         .with_context(|| format!("ffmpeg binary not found: {}", ffmpeg_bin))?;
@@ -64,10 +64,7 @@ pub fn set_ffmpeg_binary(ffmpeg_bin: &str) -> Result<(String, String)> {
     let bin_lock = FFMPEG_BIN.get_or_init(|| RwLock::new("ffmpeg".to_string()));
     *bin_lock.write().expect("FFMPEG_BIN write lock poisoned") = ffmpeg_bin.to_string();
 
-    Ok((
-        abs_ffmpeg_bin.to_string_lossy().to_string(),
-        version.to_string(),
-    ))
+    Ok((abs_ffmpeg_bin, version.to_string()))
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Display, EnumString)]

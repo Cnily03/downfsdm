@@ -89,6 +89,15 @@ async fn find_valid_hash_cached(
     None
 }
 
+macro_rules! try_filename {
+    ($path:expr) => {
+        match $path.file_name() {
+            Some(name) => name.to_string_lossy().to_string(),
+            None => $path.to_string_lossy().to_string(),
+        }
+    };
+}
+
 // * HLS / m3u8
 
 /// Fetch an m3u8 playlist, download every segment sequentially, remux each one
@@ -229,7 +238,7 @@ pub async fn download_m3u8_segments(
                 &make_status(done, downloaded, reused),
                 Some(&format!(
                     "{label}  cached  {}",
-                    valid_ts.to_string_lossy().to_string().dimmed()
+                    try_filename!(valid_ts).dimmed()
                 )),
             );
             continue;
@@ -283,12 +292,7 @@ pub async fn download_m3u8_segments(
             &make_status(done - 1, downloaded, reused),
             Some(&format!(
                 "{label}  remuxing  {}",
-                format!(
-                    "{} -> {}",
-                    raw_path.to_string_lossy(),
-                    tmp_path.to_string_lossy()
-                )
-                .dimmed()
+                try_filename!(&raw_path).dimmed()
             )),
         );
 
@@ -335,7 +339,7 @@ pub async fn download_m3u8_segments(
                 "DONE".green(),
                 size_display(raw_size_bytes).cyan(),
                 size_display(ts_size_bytes).cyan(),
-                ts_path.to_string_lossy().to_string().dimmed(),
+                try_filename!(ts_path).dimmed(),
             )),
         );
 

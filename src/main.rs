@@ -44,12 +44,13 @@ async fn main() -> Result<()> {
     let args = Args::parse();
 
     // Init ffmpeg path
-    match utils::ffmpeg::set_ffmpeg_binary(&args.ffmpeg_bin) {
-        Ok(_) => {}
+    let (ffmpeg_abs_path, ffmpeg_version) = match utils::ffmpeg::set_ffmpeg_binary(&args.ffmpeg_bin)
+    {
+        Ok((abs, v)) => (abs, v),
         Err(e) => {
             exit_error!("{}", e);
         }
-    }
+    };
 
     // Resolve the cache directory: build a system temp dir path if not specified, or use the provided path.
     let cache_dir = if let Some(dir) = args.cache_dir {
@@ -84,6 +85,14 @@ async fn main() -> Result<()> {
         "{} {}",
         "downfsdm".cyan().bold(),
         env!("CARGO_PKG_VERSION").dimmed()
+    );
+    println!(
+        "{} {} {}",
+        "ffmpeg  ".cyan().dimmed(),
+        ffmpeg_version.to_string().dimmed(),
+        format!("({})", ffmpeg_abs_path.to_string_lossy().to_string())
+            .yellow()
+            .dimmed()
     );
     println!();
 

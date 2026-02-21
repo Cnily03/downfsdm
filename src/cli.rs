@@ -18,7 +18,7 @@ pub struct Args {
     pub output: PathBuf,
 
     /// Directory for cached .ts segment files
-    /// (default: system temp dir]
+    /// (default: system temp dir)
     #[arg(long, value_name = "DIR")]
     pub cache_dir: Option<PathBuf>,
 
