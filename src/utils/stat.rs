@@ -1,6 +1,8 @@
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, OnceLock};
 
+use crate::utils::live_log::LiveLog;
+
 static CLEANUP_PATHS: OnceLock<Mutex<Vec<PathBuf>>> = OnceLock::new();
 
 pub struct CleanupGuard;
@@ -23,6 +25,7 @@ impl CleanupGuard {
         }
     }
     pub fn instant_drop() {
+        LiveLog::instant_drop();
         let paths_to_remove =
             if let Ok(mut paths) = CLEANUP_PATHS.get_or_init(|| Mutex::new(Vec::new())).lock() {
                 std::mem::take(&mut *paths)

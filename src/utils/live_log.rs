@@ -230,13 +230,17 @@ impl LiveLog {
         let _ = std::io::stdout().flush();
         self.rendered = lines;
     }
+
+    pub fn instant_drop() {
+        // Always restore cursor visibility even on panic / early return.
+        print!("\x1b[?25h"); // restore cursor
+        let _ = std::io::stdout().flush();
+    }
 }
 
 impl Drop for LiveLog {
     fn drop(&mut self) {
-        // Always restore cursor visibility even on panic / early return.
-        print!("\x1b[?25h");
-        let _ = std::io::stdout().flush();
+        LiveLog::instant_drop();
     }
 }
 
